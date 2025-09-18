@@ -2,6 +2,7 @@ package br.com.thallysprojetos.ecommerce.services;
 
 
 import br.com.thallysprojetos.ecommerce.dtos.ProdutosDTO;
+import br.com.thallysprojetos.ecommerce.exceptions.produtos.ProdutosNotFoundException;
 import br.com.thallysprojetos.ecommerce.models.Produtos;
 import br.com.thallysprojetos.ecommerce.repositories.ProdutosRepository;
 import lombok.AllArgsConstructor;
@@ -28,19 +29,17 @@ public class ProdutosService {
     public ProdutosDTO findProductById(Long id) {
         return produtosRepository.findById(id)
                 .map(p -> modelMapper.map(p, ProdutosDTO.class))
-                .orElseThrow(NoSuchElementException::new);
+                .orElseThrow(ProdutosNotFoundException::new);
     }
 
     public ProdutosDTO createProduct(ProdutosDTO dto) {
         try {
             Produtos produtos = modelMapper.map(dto, Produtos.class);
-
             Produtos produtosSaved = produtosRepository.save(produtos);
-
             return modelMapper.map(produtosSaved, ProdutosDTO.class);
         } catch (Exception exProdutos) {
             //Consertar essa parte do exception
-            throw new NoSuchElementException();
+            throw new ProdutosNotFoundException();
         }
     }
 
@@ -62,13 +61,13 @@ public class ProdutosService {
 
             return modelMapper.map(produtos, ProdutosDTO.class);
         } catch (Exception exUser) {
-            throw new NoSuchElementException("Produtos não encontrado.");
+            throw new ProdutosNotFoundException("Produtos não encontrado.");
         }
     }
 
     public void deleteProdutos(Long id) {
         if (!produtosRepository.existsById(id)) {
-            throw new NoSuchElementException(String.format("Produtos não encontrado com o id '%s'.", id));
+            throw new ProdutosNotFoundException(String.format("Produtos não encontrado com o id '%s'.", id));
         }
         produtosRepository.deleteById(id);
     }

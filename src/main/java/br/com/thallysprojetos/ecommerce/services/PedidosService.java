@@ -4,6 +4,9 @@ package br.com.thallysprojetos.ecommerce.services;
 import br.com.thallysprojetos.ecommerce.dtos.pagamentos.PagamentoDTO;
 import br.com.thallysprojetos.ecommerce.dtos.pedidos.ItemDoPedidoDTO;
 import br.com.thallysprojetos.ecommerce.dtos.pedidos.PedidosDTO;
+import br.com.thallysprojetos.ecommerce.exceptions.pedidos.PedidosNotFoundException;
+import br.com.thallysprojetos.ecommerce.exceptions.produtos.ProdutosNotFoundException;
+import br.com.thallysprojetos.ecommerce.exceptions.usuarios.UsuarioNotFoundException;
 import br.com.thallysprojetos.ecommerce.models.Produtos;
 import br.com.thallysprojetos.ecommerce.models.Usuarios;
 import br.com.thallysprojetos.ecommerce.models.enums.StatusPagamento;
@@ -46,13 +49,13 @@ public class PedidosService {
     public PedidosDTO findById(Long id) {
         return pedidosRepository.findById(id)
                 .map(p -> modelMapper.map(p, PedidosDTO.class))
-                .orElseThrow(NoSuchElementException::new);
+                .orElseThrow(PedidosNotFoundException::new);
     }
 
     public List<PedidosDTO> findByUserId(Long id) {
         List<Pedidos> pedidos = pedidosRepository.findByUsuarioId(id);
         if (pedidos.isEmpty()) {
-            throw new NoSuchElementException("Nenhum pedido encontrado para o usuário fornecido.");
+            throw new PedidosNotFoundException("Nenhum pedido encontrado para o usuário fornecido.");
         }
         return pedidos.stream()
                 .map(p -> modelMapper.map(p, PedidosDTO.class))
@@ -62,7 +65,7 @@ public class PedidosService {
     public PedidosDTO createPedido(PedidosDTO dto) {
 
         Usuarios usuario = usuarioRepository.findById(dto.getUsuario().getId())
-                .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado"));
+                .orElseThrow(() -> new UsuarioNotFoundException("Usuário não encontrado"));
 
         Pedidos novoPedido = modelMapper.map(dto, Pedidos.class);
 
@@ -76,7 +79,7 @@ public class PedidosService {
 
         for (ItemDoPedidoDTO itemDto : dto.getItens()) {
             Produtos produto = produtosRepository.findById(itemDto.getProduto().getId())
-                    .orElseThrow(() -> new NoSuchElementException("Produto não encontrado com o ID: " + itemDto.getProduto().getId()));
+                    .orElseThrow(() -> new ProdutosNotFoundException("Produto não encontrado com o ID: " + itemDto.getProduto().getId()));
 
             ItemDoPedido novoItem = new ItemDoPedido();
             novoItem.setQuantidade(itemDto.getQuantidade());
@@ -95,7 +98,7 @@ public class PedidosService {
     @Transactional
     public void processarPagamentoDoPedido(Long idPedido, PagamentoDTO pagamentoDto) {
         Pedidos pedido = pedidosRepository.findById(idPedido)
-                .orElseThrow(() -> new NoSuchElementException("Pedido não encontrado."));
+                .orElseThrow(() -> new PedidosNotFoundException("Pedido não encontrado."));
 
         Pagamento novoPagamento = modelMapper.map(pagamentoDto, Pagamento.class);
         novoPagamento.setStatus(StatusPagamento.CRIADO);
@@ -124,20 +127,20 @@ public class PedidosService {
 
             return modelMapper.map(pedidos, PedidosDTO.class);
         } catch (Exception exUser) {
-            throw new NoSuchElementException("Pedidos não encontrado.");
+            throw new PedidosNotFoundException("Pedidos não encontrado.");
         }
     }
 
     public void deletePedidos(Long id) {
         if (!pedidosRepository.existsById(id)) {
-            throw new NoSuchElementException(String.format("Pedidos não encontrado com o id '%s'.", id));
+            throw new PedidosNotFoundException(String.format("Pedidos não encontrado com o id '%s'.", id));
         }
         pedidosRepository.deleteById(id);
     }
 
     public void confirmarPedidos(Long id) {
         Pedidos pedido = pedidosRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Pedido não encontrado"));
+                .orElseThrow(() -> new PedidosNotFoundException("Pedido não encontrado"));
 
         if (pedido.getPagamento().getStatus() == StatusPagamento.CONFIRMADO) {
             pedido.setStatusPedidos(StatusPedidos.PAGO);
@@ -150,7 +153,7 @@ public class PedidosService {
 
     public void cancelarPedido(Long id) {
         Pedidos pedido = pedidosRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Pedido não encontrado"));
+                .orElseThrow(() -> new PedidosNotFoundException("Pedido não encontrado"));
 
         pedido.setStatusPedidos(StatusPedidos.CANCELADO);
         pedidosRepository.save(pedido);

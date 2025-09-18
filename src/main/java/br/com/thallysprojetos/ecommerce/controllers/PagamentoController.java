@@ -31,7 +31,7 @@ public class PagamentoController {
 
     @GetMapping("/pedido/{idPedido}")
     public ResponseEntity<PagamentoDTO> findPagamentoByPedido(@Valid @PathVariable Long idPedido) {
-        return ResponseEntity.ok().body(service.findByIdPedido(idPedido));
+        return ResponseEntity.ok().body(service.findByPedidoId(idPedido));
     }
 
     @PutMapping("/update/{id}")

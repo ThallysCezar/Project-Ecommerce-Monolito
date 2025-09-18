@@ -2,9 +2,12 @@ package br.com.thallysprojetos.ecommerce.services;
 
 
 import br.com.thallysprojetos.ecommerce.dtos.pagamentos.PagamentoDTO;
+import br.com.thallysprojetos.ecommerce.exceptions.pagamento.PagamentoNotFoundException;
+import br.com.thallysprojetos.ecommerce.exceptions.pedidos.PedidosNotFoundException;
 import br.com.thallysprojetos.ecommerce.models.enums.StatusPagamento;
 import br.com.thallysprojetos.ecommerce.models.pagamentos.Pagamento;
 import br.com.thallysprojetos.ecommerce.repositories.PagamentoRepository;
+import br.com.thallysprojetos.ecommerce.repositories.PedidosRepository;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -18,6 +21,7 @@ import java.util.NoSuchElementException;
 public class PagamentoService {
 
     private final PagamentoRepository pagamentoRepository;
+    private final PedidosRepository pedidosRepository;
     private final ModelMapper modelMapper;
 
     public Page<PagamentoDTO> findAll(Pageable page) {
@@ -27,13 +31,18 @@ public class PagamentoService {
     public PagamentoDTO findById(Long id) {
         return pagamentoRepository.findById(id)
                 .map(p -> modelMapper.map(p, PagamentoDTO.class))
-                .orElseThrow(NoSuchElementException::new);
+                .orElseThrow(PagamentoNotFoundException::new);
     }
 
-    public PagamentoDTO findByIdPedido(Long idPedido) {
-        return pagamentoRepository.findByPedidoId(idPedido)
-                .map(p -> modelMapper.map(p, PagamentoDTO.class))
-                .orElseThrow(NoSuchElementException::new);
+    public PagamentoDTO findByPedidoId(Long idPedido) {
+        return pedidosRepository.findById(idPedido)
+                .map(pedido -> {
+                    if (pedido.getPagamento() == null) {
+                        throw new NoSuchElementException("Nenhum pagamento encontrado para este pedido.");
+                    }
+                    return modelMapper.map(pedido.getPagamento(), PagamentoDTO.class);
+                })
+                .orElseThrow(() -> new PedidosNotFoundException("Pedido não encontrado com o ID: " + idPedido));
     }
 
     public PagamentoDTO updatePagamento(Long id, PagamentoDTO dto) {
@@ -44,21 +53,20 @@ public class PagamentoService {
 
             return modelMapper.map(pagamento, PagamentoDTO.class);
         } catch (Exception exUser) {
-            throw new NoSuchElementException("Pagamento não encontrado.");
+            throw new PagamentoNotFoundException("Pagamento não encontrado.");
         }
     }
 
     public void deletePagamento(Long id) {
         if (!pagamentoRepository.existsById(id)) {
-            throw new NoSuchElementException(String.format("Pagamento não encontrado com o id '%s'.", id));
+            throw new PagamentoNotFoundException(String.format("Pagamento não encontrado com o id '%s'.", id));
         }
         pagamentoRepository.deleteById(id);
     }
 
     public void processarPagamento(Long id) {
-
         Pagamento pagamento = pagamentoRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Pagamento não encontrado com o ID: " + id));
+                .orElseThrow(() -> new PagamentoNotFoundException("Pagamento não encontrado com o ID: " + id));
 
         if (pagamento.getStatus().equals(StatusPagamento.CRIADO)) {
             pagamento.setStatus(StatusPagamento.CONFIRMADO);
