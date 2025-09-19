@@ -1,7 +1,7 @@
 package br.com.thallysprojetos.ecommerce.services;
 
 
-import br.com.thallysprojetos.ecommerce.dtos.pagamentos.PagamentoDTO;
+import br.com.thallysprojetos.ecommerce.dtos.PagamentoDTO;
 import br.com.thallysprojetos.ecommerce.exceptions.pagamento.PagamentoNotFoundException;
 import br.com.thallysprojetos.ecommerce.exceptions.pedidos.PedidosNotFoundException;
 import br.com.thallysprojetos.ecommerce.models.enums.StatusPagamento;

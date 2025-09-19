@@ -5,15 +5,14 @@ import br.com.thallysprojetos.ecommerce.models.enums.TipoFormaPagamento;
 import br.com.thallysprojetos.ecommerce.models.pedidos.Pedidos;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "tb_pagamentos")
+@Getter
+@Setter
 public class Pagamento {
 
     @Id

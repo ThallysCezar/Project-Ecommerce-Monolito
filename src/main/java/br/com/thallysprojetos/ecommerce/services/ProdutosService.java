@@ -5,6 +5,7 @@ import br.com.thallysprojetos.ecommerce.dtos.ProdutosDTO;
 import br.com.thallysprojetos.ecommerce.exceptions.produtos.ProdutosNotFoundException;
 import br.com.thallysprojetos.ecommerce.models.Produtos;
 import br.com.thallysprojetos.ecommerce.repositories.ProdutosRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -12,7 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,17 +32,14 @@ public class ProdutosService {
                 .orElseThrow(ProdutosNotFoundException::new);
     }
 
+    @Transactional
     public ProdutosDTO createProduct(ProdutosDTO dto) {
-        try {
-            Produtos produtos = modelMapper.map(dto, Produtos.class);
-            Produtos produtosSaved = produtosRepository.save(produtos);
-            return modelMapper.map(produtosSaved, ProdutosDTO.class);
-        } catch (Exception exProdutos) {
-            //Consertar essa parte do exception
-            throw new ProdutosNotFoundException();
-        }
+        Produtos produtos = modelMapper.map(dto, Produtos.class);
+        Produtos produtosSaved = produtosRepository.save(produtos);
+        return modelMapper.map(produtosSaved, ProdutosDTO.class);
     }
 
+    @Transactional
     public List<ProdutosDTO> createProducts(List<ProdutosDTO> dtos) {
         return dtos.stream()
                 .map(dto -> {
@@ -53,18 +50,23 @@ public class ProdutosService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public ProdutosDTO updateProdutos(Long id, ProdutosDTO dto) {
-        try {
-            Produtos produtos = modelMapper.map(dto, Produtos.class);
-            produtos.setId(id);
-            produtos = produtosRepository.save(produtos);
+        Produtos produtoExistente = produtosRepository.findById(id)
+                .orElseThrow(() -> new ProdutosNotFoundException("Produto não encontrado com o ID: " + id));
 
-            return modelMapper.map(produtos, ProdutosDTO.class);
-        } catch (Exception exUser) {
-            throw new ProdutosNotFoundException("Produtos não encontrado.");
-        }
+        produtoExistente.setTitulo(dto.getTitulo());
+        produtoExistente.setTipoProduto(dto.getTipoProduto());
+        produtoExistente.setDescricao(dto.getDescricao());
+        produtoExistente.setPreco(dto.getPreco());
+        produtoExistente.setItemEstoque(dto.isItemEstoque());
+        produtoExistente.setEstoque(dto.getEstoque());
+
+        Produtos produtoAtualizado = produtosRepository.save(produtoExistente);
+        return modelMapper.map(produtoAtualizado, ProdutosDTO.class);
     }
 
+    @Transactional
     public void deleteProdutos(Long id) {
         if (!produtosRepository.existsById(id)) {
             throw new ProdutosNotFoundException(String.format("Produtos não encontrado com o id '%s'.", id));

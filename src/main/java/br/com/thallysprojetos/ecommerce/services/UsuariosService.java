@@ -5,13 +5,12 @@ import br.com.thallysprojetos.ecommerce.dtos.UsuariosDTO;
 import br.com.thallysprojetos.ecommerce.exceptions.usuarios.UsuarioNotFoundException;
 import br.com.thallysprojetos.ecommerce.models.Usuarios;
 import br.com.thallysprojetos.ecommerce.repositories.UsuariosRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.NoSuchElementException;
 
 @Service
 @AllArgsConstructor
@@ -36,12 +35,14 @@ public class UsuariosService {
                 .orElseThrow(() -> new UsuarioNotFoundException("Usuário não encontrado com o e-mail fornecido."));
     }
 
+    @Transactional
     public UsuariosDTO createUser(UsuariosDTO dto) {
-            Usuarios usuarios = modelMapper.map(dto, Usuarios.class);
-            Usuarios usuariosSaved = usuariosRepository.save(usuarios);
-            return modelMapper.map(usuariosSaved, UsuariosDTO.class);
+        Usuarios usuarios = modelMapper.map(dto, Usuarios.class);
+        Usuarios usuariosSaved = usuariosRepository.save(usuarios);
+        return modelMapper.map(usuariosSaved, UsuariosDTO.class);
     }
 
+    @Transactional
     public void updateUsuarios(Long id, UsuariosDTO dto) {
         try {
             Usuarios usuarios = modelMapper.map(dto, Usuarios.class);
@@ -54,6 +55,7 @@ public class UsuariosService {
         }
     }
 
+    @Transactional
     public void deleteUsuarios(Long id) {
         if (!usuariosRepository.existsById(id)) {
             throw new UsuarioNotFoundException(String.format("Usuarios não encontrado com o id '%s'.", id));

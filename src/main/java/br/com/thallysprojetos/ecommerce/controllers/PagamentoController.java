@@ -1,6 +1,6 @@
 package br.com.thallysprojetos.ecommerce.controllers;
 
-import br.com.thallysprojetos.ecommerce.dtos.pagamentos.PagamentoDTO;
+import br.com.thallysprojetos.ecommerce.dtos.PagamentoDTO;
 import br.com.thallysprojetos.ecommerce.services.PagamentoService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;

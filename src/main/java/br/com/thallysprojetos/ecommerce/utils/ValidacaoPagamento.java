@@ -14,7 +14,9 @@ import java.lang.annotation.Target;
 public @interface ValidacaoPagamento {
 
     String message() default "Dados de pagamento inválidos para o tipo de pagamento selecionado.";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 
 }

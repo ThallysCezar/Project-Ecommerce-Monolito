@@ -1,7 +1,7 @@
 package br.com.thallysprojetos.ecommerce.services;
 
 
-import br.com.thallysprojetos.ecommerce.dtos.pagamentos.PagamentoDTO;
+import br.com.thallysprojetos.ecommerce.dtos.PagamentoDTO;
 import br.com.thallysprojetos.ecommerce.dtos.pedidos.ItemDoPedidoDTO;
 import br.com.thallysprojetos.ecommerce.dtos.pedidos.PedidosDTO;
 import br.com.thallysprojetos.ecommerce.exceptions.pedidos.PedidosNotFoundException;
@@ -28,8 +28,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -62,6 +63,7 @@ public class PedidosService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public PedidosDTO createPedido(PedidosDTO dto) {
 
         Usuarios usuario = usuarioRepository.findById(dto.getUsuario().getId())
@@ -114,23 +116,24 @@ public class PedidosService {
         pedidosRepository.save(pedido);
     }
 
+    @Transactional
     public PedidosDTO updatePedidos(Long id, PedidosDTO dto) {
-        try {
-            Pedidos pedidos = modelMapper.map(dto, Pedidos.class);
-            pedidos.setId(id);
-            pedidos.setStatusPedidos(dto.getStatusPedidos());
-            pedidos.setItens(modelMapper.map(dto, Pedidos.class).getItens());
+        Pedidos pedidoExistente = pedidosRepository.findById(id)
+                .orElseThrow(() -> new PedidosNotFoundException("Pedido não encontrado com o ID: " + id));
 
-            Pedidos finalPedidos = pedidos;
-            pedidos.getItens().forEach(item -> item.setPedido(finalPedidos));
-            pedidos = pedidosRepository.save(pedidos);
-
-            return modelMapper.map(pedidos, PedidosDTO.class);
-        } catch (Exception exUser) {
-            throw new PedidosNotFoundException("Pedidos não encontrado.");
+        if (dto.getStatusPedidos() != null) {
+            pedidoExistente.setStatusPedidos(dto.getStatusPedidos());
         }
+
+        if (dto.getItens() != null) {
+            sincronizarItensDoPedido(pedidoExistente, dto.getItens());
+        }
+
+        Pedidos pedidoAtualizado = pedidosRepository.save(pedidoExistente);
+        return modelMapper.map(pedidoAtualizado, PedidosDTO.class);
     }
 
+    @Transactional
     public void deletePedidos(Long id) {
         if (!pedidosRepository.existsById(id)) {
             throw new PedidosNotFoundException(String.format("Pedidos não encontrado com o id '%s'.", id));
@@ -157,6 +160,34 @@ public class PedidosService {
 
         pedido.setStatusPedidos(StatusPedidos.CANCELADO);
         pedidosRepository.save(pedido);
+    }
+
+    private void sincronizarItensDoPedido(Pedidos pedidoExistente, List<ItemDoPedidoDTO> itensDto) {
+        Map<Long, ItemDoPedido> itensExistentesMap = pedidoExistente.getItens().stream()
+                .collect(Collectors.toMap(ItemDoPedido::getId, item -> item));
+
+        Map<Long, ItemDoPedido> itensParaManter = new HashMap<>();
+
+        for (ItemDoPedidoDTO itemDto : itensDto) {
+            if (itemDto.getId() != null && itensExistentesMap.containsKey(itemDto.getId())) {
+                ItemDoPedido itemParaAtualizar = itensExistentesMap.get(itemDto.getId());
+                itemParaAtualizar.setQuantidade(itemDto.getQuantidade());
+                itemParaAtualizar.setDescricao(itemDto.getDescricao());
+
+                itensParaManter.put(itemParaAtualizar.getId(), itemParaAtualizar);
+            } else if (itemDto.getId() == null) {
+                Produtos produto = produtosRepository.findById(itemDto.getProduto().getId())
+                        .orElseThrow(() -> new ProdutosNotFoundException("Produto não encontrado com o ID: " + itemDto.getProduto().getId()));
+
+                ItemDoPedido novoItem = modelMapper.map(itemDto, ItemDoPedido.class);
+                novoItem.setProduto(produto);
+                novoItem.setPedido(pedidoExistente);
+
+                pedidoExistente.getItens().add(novoItem);
+            }
+        }
+
+        pedidoExistente.getItens().removeIf(item -> !itensParaManter.containsKey(item.getId()));
     }
 
 }

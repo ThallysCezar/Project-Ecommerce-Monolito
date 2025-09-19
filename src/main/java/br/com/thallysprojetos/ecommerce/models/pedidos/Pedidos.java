@@ -4,21 +4,21 @@ import br.com.thallysprojetos.ecommerce.models.Usuarios;
 import br.com.thallysprojetos.ecommerce.models.enums.StatusPedidos;
 import br.com.thallysprojetos.ecommerce.models.pagamentos.Pagamento;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "tb_pedidos")
+@Getter
+@Setter
 public class Pedidos {
 
     @Id
