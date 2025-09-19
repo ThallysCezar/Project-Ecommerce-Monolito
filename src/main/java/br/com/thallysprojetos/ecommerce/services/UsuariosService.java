@@ -43,16 +43,15 @@ public class UsuariosService {
     }
 
     @Transactional
-    public void updateUsuarios(Long id, UsuariosDTO dto) {
-        try {
-            Usuarios usuarios = modelMapper.map(dto, Usuarios.class);
-            usuarios.setId(id);
-            usuarios = usuariosRepository.save(usuarios);
+    public UsuariosDTO updateUsuarios(Long id, UsuariosDTO dto) {
+        Usuarios existingUser = usuariosRepository.findById(id)
+                .orElseThrow(() -> new UsuarioNotFoundException("Usuário não encontrado com o ID: " + id));
 
-            modelMapper.map(usuarios, UsuariosDTO.class);
-        } catch (Exception exUser) {
-            throw new UsuarioNotFoundException("Usuarios não encontrado.");
-        }
+        existingUser.setUserName(dto.getUserName());
+        existingUser.setEmail(dto.getEmail());
+        Usuarios updatedUser = usuariosRepository.save(existingUser);
+
+        return modelMapper.map(updatedUser, UsuariosDTO.class);
     }
 
     @Transactional
