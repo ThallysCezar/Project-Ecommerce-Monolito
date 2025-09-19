@@ -38,7 +38,7 @@ public class PagamentoService {
         return pedidosRepository.findById(idPedido)
                 .map(pedido -> {
                     if (pedido.getPagamento() == null) {
-                        throw new NoSuchElementException("Nenhum pagamento encontrado para este pedido.");
+                        throw new PagamentoNotFoundException("Nenhum pagamento encontrado para este pedido.");
                     }
                     return modelMapper.map(pedido.getPagamento(), PagamentoDTO.class);
                 })
@@ -46,15 +46,15 @@ public class PagamentoService {
     }
 
     public PagamentoDTO updatePagamento(Long id, PagamentoDTO dto) {
-        try {
-            Pagamento pagamento = modelMapper.map(dto, Pagamento.class);
-            pagamento.setId(id);
-            pagamento = pagamentoRepository.save(pagamento);
+        Pagamento pagamentoExistente = pagamentoRepository.findById(id)
+                .orElseThrow(() -> new PagamentoNotFoundException("Pagamento não encontrado com o ID: " + id));
 
-            return modelMapper.map(pagamento, PagamentoDTO.class);
-        } catch (Exception exUser) {
-            throw new PagamentoNotFoundException("Pagamento não encontrado.");
+        if (dto.getValor() != null) {
+            pagamentoExistente.setValor(dto.getValor());
         }
+
+        Pagamento pagamentoAtualizado = pagamentoRepository.save(pagamentoExistente);
+        return modelMapper.map(pagamentoAtualizado, PagamentoDTO.class);
     }
 
     public void deletePagamento(Long id) {

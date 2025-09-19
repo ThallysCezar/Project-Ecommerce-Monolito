@@ -69,28 +69,20 @@ public class PedidosService {
         Usuarios usuario = usuarioRepository.findById(dto.getUsuario().getId())
                 .orElseThrow(() -> new UsuarioNotFoundException("Usuário não encontrado"));
 
+        // Mapeia o DTO para a entidade, incluindo todos os itens
         Pedidos novoPedido = modelMapper.map(dto, Pedidos.class);
-
         novoPedido.setUsuario(usuario);
         novoPedido.setStatusPedidos(StatusPedidos.CRIADO);
         novoPedido.setDataHora(LocalDateTime.now());
 
-
-        novoPedido.setItens(new ArrayList<>());
-
-
-        for (ItemDoPedidoDTO itemDto : dto.getItens()) {
-            Produtos produto = produtosRepository.findById(itemDto.getProduto().getId())
-                    .orElseThrow(() -> new ProdutosNotFoundException("Produto não encontrado com o ID: " + itemDto.getProduto().getId()));
-
-            ItemDoPedido novoItem = new ItemDoPedido();
-            novoItem.setQuantidade(itemDto.getQuantidade());
-            novoItem.setDescricao(itemDto.getDescricao());
-            novoItem.setProduto(produto);
-
-            novoItem.setPedido(novoPedido);
-
-            novoPedido.getItens().add(novoItem);
+        // Sincroniza o relacionamento bidirecional
+        if (novoPedido.getItens() != null) {
+            novoPedido.getItens().forEach(item -> {
+                Produtos produto = produtosRepository.findById(item.getProduto().getId())
+                        .orElseThrow(() -> new ProdutosNotFoundException("Produto não encontrado com o ID: " + item.getProduto().getId()));
+                item.setProduto(produto);
+                item.setPedido(novoPedido);
+            });
         }
 
         Pedidos pedidoSalvo = pedidosRepository.save(novoPedido);
@@ -144,6 +136,10 @@ public class PedidosService {
     public void confirmarPedidos(Long id) {
         Pedidos pedido = pedidosRepository.findById(id)
                 .orElseThrow(() -> new PedidosNotFoundException("Pedido não encontrado"));
+
+        if (pedido.getPagamento() == null) {
+            throw new PedidosNotFoundException("O pedido ainda não tem um pagamento associado.");
+        }
 
         if (pedido.getPagamento().getStatus() == StatusPagamento.CONFIRMADO) {
             pedido.setStatusPedidos(StatusPedidos.PAGO);
