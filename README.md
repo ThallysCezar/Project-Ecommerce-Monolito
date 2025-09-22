@@ -5,10 +5,10 @@ Este projeto é uma aplicação de e-commerce construída com a arquitetura mono
 A arquitetura do projeto é monolítica e segue o padrão de camadas, onde cada componente tem uma responsabilidade específica.
 
 - Arquitetura e Estrutura da aplicação:
-![App Screenshot](https://github.com/ThallysCezar/Project-Ecommerce-Monolito/src/main/resources/imagesToReadMe/Arquitetura.jpeg)
+![App Screenshot](https://github.com/ThallysCezar/Project-Ecommerce-Monolito/blob/main/src/main/resources/imagesToReadMe/Arquitetura.jpeg)
 
 - Fluxograma da aplicação:
-![App Screenshot](https://github.com/ThallysCezar/Project-Ecommerce-Monolito/src/main/resources/imagesToReadMe/Fluxograma.jpeg)
+![App Screenshot](https://github.com/ThallysCezar/Project-Ecommerce-Monolito/blob/main/src/main/resources/imagesToReadMe/Fluxograma.jpg)
 
 
 ## Tecnologias Utilizadas
