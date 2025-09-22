@@ -1,4 +1,4 @@
-# Project-Ecommerce-Monolito-
+# Project-Ecommerce-Monolítico
 Este projeto é uma aplicação de e-commerce construída com a arquitetura monolítica, utilizando o framework Spring Boot. O objetivo é demonstrar a construção de uma API REST completa para gerenciar pedidos, produtos, usuários e pagamentos, com foco em boas práticas de design de software, testes unitários, e padrões de persistência com JPA. A aplicação foi desenvolvida com uma abordagem de "código limpo", garantindo a separação de responsabilidades entre as camadas de Controller, Service e Repository.
 
 ## Diagrama de Arquitetura
@@ -43,11 +43,9 @@ Para executar a aplicação, a forma mais fácil e recomendada é através do Do
 
 
 ## Mapeamento de Endpoints - Ecommerce Monolítico
-
 Este documento mapeia e descreve os endpoints da API do projeto de e-commerce "Ecommerce Monolito", organizados por funcionalidade para facilitar a consulta.
 
 ### 1. Usuários (`localhost:8080/usuarios`)
-
 Endpoints dedicados ao gerenciamento de usuários no sistema.
 
 * **`GET /usuarios`**
@@ -76,10 +74,8 @@ Endpoints dedicados ao gerenciamento de usuários no sistema.
 * **`DELETE /usuarios/delete/{id}`**
     * **Propósito:** Deletar um usuário pelo ID.
 
----
 
 ### 2. Produtos (`localhost:8080/produtos`)
-
 Endpoints para gerenciar os produtos disponíveis para venda.
 
 * **`GET /produtos`**
@@ -141,9 +137,7 @@ Endpoints para gerenciar os produtos disponíveis para venda.
     * **Propósito:** Deletar um produto pelo ID.
 
 
-
 ### 3. Pedidos (`localhost:8080/pedidos`)
-
 Endpoints para gerenciar o ciclo de vida dos pedidos.
 
 * **`GET /pedidos`**
@@ -220,7 +214,6 @@ Endpoints para gerenciar o ciclo de vida dos pedidos.
 
 
 ### 4. Pagamentos (`localhost:8080/pagamentos`)
-
 Endpoints para gerenciar e processar pagamentos.
 
 * **`GET /pagamentos`**
@@ -240,7 +233,7 @@ Endpoints para gerenciar e processar pagamentos.
 
 * **`DELETE /pagamentos/delete/{id}`**
     * **Propósito:** Deletar um pagamento. 
----
+
 
 ### Resultados dos Testes
 
