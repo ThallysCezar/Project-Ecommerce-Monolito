@@ -26,12 +26,11 @@ public class SwaggerConfig {
 
         return new OpenAPI().info(
                 new Info()
-                        .title("Projeto Ecommerce Monolito")
+                        .title("Projeto Ecommerce Monolítico")
                         .version("1.0")
-                        .description("Este projeto é uma solução de e-commerce completa," +
-                                " desenvolvida com uma arquitetura monolítica. A plataforma foi concebida para integrar " +
-                                "todas as funcionalidades essenciais, como catálogo de produtos, carrinho de compras, " +
-                                "gestão de usuários e processamento de pedidos, em uma única e coesa base de código.")
+                        .description("This project is a complete e-commerce solution developed with a monolithic architecture." +
+                        " The platform is designed to integrate all essential functionalities, such as product catalog, " +
+                        " shopping cart, user management, and order processing, into a single and cohesive codebase.")
                         .contact(contato)
         );
     }

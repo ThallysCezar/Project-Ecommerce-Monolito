@@ -42,7 +42,7 @@ Para executar a aplicação, a forma mais fácil e recomendada é através do Do
     `http://localhost:8080/swagger-ui.html`
 
 
-## Mapeamento de Endpoints - Ecommerce Monolito
+## Mapeamento de Endpoints - Ecommerce Monolítico
 
 Este documento mapeia e descreve os endpoints da API do projeto de e-commerce "Ecommerce Monolito", organizados por funcionalidade para facilitar a consulta.
 
