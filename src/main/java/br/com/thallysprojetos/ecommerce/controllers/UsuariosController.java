@@ -17,7 +17,6 @@ import java.net.URI;
 @RestController
 @RequestMapping("/usuarios")
 @AllArgsConstructor
-//@SecurityRequirement(name = "Bearer Authentication")
 public class UsuariosController {
 
     private final UsuariosService service;

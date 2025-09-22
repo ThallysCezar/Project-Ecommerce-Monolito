@@ -19,7 +19,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/pedidos")
 @AllArgsConstructor
-//@SecurityRequirement(name = "Bearer Authentication")
 public class PedidosController {
 
     private final PedidosService service;

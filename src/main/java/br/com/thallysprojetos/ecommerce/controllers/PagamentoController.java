@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/pagamentos")
 @AllArgsConstructor
-//@SecurityRequirement(name = "Bearer Authentication")
 public class PagamentoController {
 
     private final PagamentoService service;
@@ -41,7 +40,6 @@ public class PagamentoController {
     }
 
     @PatchMapping("/{id}/confirmar")
-//    @CircuitBreaker(name = "atualizaPedido", fallbackMethod = "pagamentoAutorizadoComIntegracaoPendente")
     public void confirmarPagamento(@PathVariable Long id) {
         service.processarPagamento(id);
     }

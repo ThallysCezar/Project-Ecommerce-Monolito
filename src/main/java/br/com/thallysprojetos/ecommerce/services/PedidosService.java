@@ -27,7 +27,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,13 +68,11 @@ public class PedidosService {
         Usuarios usuario = usuarioRepository.findById(dto.getUsuario().getId())
                 .orElseThrow(() -> new UsuarioNotFoundException("Usuário não encontrado"));
 
-        // Mapeia o DTO para a entidade, incluindo todos os itens
         Pedidos novoPedido = modelMapper.map(dto, Pedidos.class);
         novoPedido.setUsuario(usuario);
         novoPedido.setStatusPedidos(StatusPedidos.CRIADO);
         novoPedido.setDataHora(LocalDateTime.now());
 
-        // Sincroniza o relacionamento bidirecional
         if (novoPedido.getItens() != null) {
             novoPedido.getItens().forEach(item -> {
                 Produtos produto = produtosRepository.findById(item.getProduto().getId())

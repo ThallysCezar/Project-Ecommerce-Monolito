@@ -18,7 +18,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/produtos")
 @AllArgsConstructor
-//@SecurityRequirement(name = "Bearer Authentication")
 public class ProdutosController {
 
     private final ProdutosService service;
@@ -46,7 +45,7 @@ public class ProdutosController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<List<ProdutosDTO>> createProduct(@Valid @RequestBody List<ProdutosDTO> dtos, UriComponentsBuilder uriBuilder) {
         List<ProdutosDTO> produtos = service.createProducts(dtos);
-        URI endereco = uriBuilder.path("/produtos/batch").build().toUri(); // URI de resposta genérica
+        URI endereco = uriBuilder.path("/produtos/batch").build().toUri();
         return ResponseEntity.created(endereco).body(produtos);
     }
 
